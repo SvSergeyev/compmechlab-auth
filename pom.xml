@@ -48,7 +48,6 @@
             <version>1.0.1.RELEASE</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
