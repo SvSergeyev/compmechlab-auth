@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.http.HttpHeaders;
+import java.net.http.HttpRequest;
 
 @RestController
 @RequestMapping("/")
@@ -16,8 +17,8 @@ public class MainController {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainController.class);
 
     @GetMapping
-    public String index(HttpHeaders headers) {
-        LOGGER.info("GET request received{}", headers.toString());
+    public String index() {
+        LOGGER.info("GET request received");
         return "index";
     }
 }
