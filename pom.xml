@@ -16,60 +16,60 @@
     <properties>
         <java.version>11</java.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.springframework.security.kerberos/spring-security-kerberos-web -->
-        <dependency>
-            <groupId>org.springframework.security.kerberos</groupId>
-            <artifactId>spring-security-kerberos-web</artifactId>
-            <version>1.0.1.RELEASE</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-ldap -->
+<!-- LDAP -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-ldap</artifactId>
             <version>5.6.2</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.springframework.security.kerberos/spring-security-kerberos-client -->
-        <dependency>
-            <groupId>org.springframework.security.kerberos</groupId>
-            <artifactId>spring-security-kerberos-client</artifactId>
-            <version>1.0.1.RELEASE</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.ldap</groupId>
             <artifactId>spring-ldap-core</artifactId>
         </dependency>
 
+<!-- Kerberos -->
+        <dependency>
+            <groupId>org.springframework.security.kerberos</groupId>
+            <artifactId>spring-security-kerberos-web</artifactId>
+            <version>1.0.1.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.kerberos</groupId>
+            <artifactId>spring-security-kerberos-client</artifactId>
+            <version>1.0.1.RELEASE</version>
+        </dependency>
+
+<!-- Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+<!-- Utils -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+<!-- Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
