@@ -23,6 +23,8 @@ import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import tech.sergeyev.compmechlabauth.ActiveDirectoryLdapAuthoritiesPopulator;
 
+import java.io.IOException;
+
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -105,12 +107,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public SunJaasKerberosTicketValidator sunJaasKerberosTicketValidator() {
+    public SunJaasKerberosTicketValidator sunJaasKerberosTicketValidator() throws IOException {
         SunJaasKerberosTicketValidator validator =
                 new SunJaasKerberosTicketValidator();
         validator.setServicePrincipal(servicePrincipal);
         FileSystemResource resource = new FileSystemResource(keytabLocation);
         validator.setKeyTabLocation(resource);
+        LOGGER.info("KEYTAB:{}", resource.contentLength());
         LOGGER.info(
                 "Initializing Kerberos KEYTAB file path:{} for principal:{}, file exists:{}",
                 resource.getFilename(), servicePrincipal, resource.exists()
