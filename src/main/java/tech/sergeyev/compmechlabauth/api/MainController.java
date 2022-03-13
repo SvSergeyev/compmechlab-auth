@@ -13,9 +13,8 @@ public class MainController {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainController.class);
 
     @GetMapping
-    public ModelAndView index(ModelAndView modelAndView) {
+    public String index() {
         LOGGER.info("GET request received");
-        modelAndView.setViewName("index");
-        return modelAndView;
+        return "Hello, user!";
     }
 }
