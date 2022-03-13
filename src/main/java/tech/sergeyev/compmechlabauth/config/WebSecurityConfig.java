@@ -55,10 +55,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .authenticationEntryPoint(spnegoEntryPoint())
                     .and()
                 .authorizeRequests()
-                    .anyRequest().fullyAuthenticated()
+                    .anyRequest().authenticated()
                     .and()
-                .formLogin()
-                    .and()
+//                .formLogin()
+//                    .and()
                 .addFilterBefore(
                         spnegoAuthenticationProcessingFilter(),
                         BasicAuthenticationFilter.class
