@@ -113,7 +113,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         validator.setServicePrincipal(servicePrincipal);
         FileSystemResource resource = new FileSystemResource(keytabLocation);
         validator.setKeyTabLocation(resource);
-        LOGGER.info("\n\nKEYTAB:{}", resource.contentLength());
+//        LOGGER.info("\n\nKEYTAB:{}", resource.contentLength());
         LOGGER.info(
                 "\n\nInitializing Kerberos KEYTAB file path:{} for principal:{}, file exists:{}",
                 resource.getFilename(), servicePrincipal, resource.exists()
