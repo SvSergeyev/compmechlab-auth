@@ -65,27 +65,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 // Рабочая версия.
 // По-экспериментировал? Не работает?
-// Удали свою хуиту и раскомментируй эту реализацию
+// Удали всю написанную хуиту и раскомментируй эту реализацию
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .authenticationProvider(kerberosServiceAuthenticationProvider())
                 .authenticationProvider(activeDirectoryLdapAuthenticationProvider());
     }
-
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth
-//                .ldapAuthentication()
-//                    .userDnPatterns("uid={0},ou=users") // ???
-//                    .groupSearchBase("ou=groups")
-//                .contextSource()
-//                    .url("ldap://WIN-HJLE4GOGD2D:389/dc=cml,dc=com")
-//                    .and()
-//                .passwordCompare()
-//                    .passwordEncoder(new BCryptPasswordEncoder())
-//                    .passwordAttribute("userPassword");
-//    }
 
     @Bean
     public ActiveDirectoryLdapAuthenticationProvider activeDirectoryLdapAuthenticationProvider() {
@@ -152,6 +138,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public LdapUserDetailsService ldapUserDetailsService() throws Exception {
+        LOGGER.info("\n\nldapUserDetailsService() run");
         FilterBasedLdapUserSearch search = new FilterBasedLdapUserSearch(
                 ldapSearchBase,
                 ldapSearchFilter,
@@ -159,7 +146,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         );
         LdapUserDetailsService service = new LdapUserDetailsService(
                 search,
-                new ActiveDirectoryLdapAuthoritiesPopulator());
+                new ActiveDirectoryLdapAuthoritiesPopulator()
+        );
         service.setUserDetailsMapper(new LdapUserDetailsMapper());
         return service;
     }
