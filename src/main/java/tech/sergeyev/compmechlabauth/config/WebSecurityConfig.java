@@ -1,12 +1,11 @@
 package tech.sergeyev.compmechlabauth.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -27,6 +26,7 @@ import tech.sergeyev.compmechlabauth.ActiveDirectoryLdapAuthoritiesPopulator;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebSecurityConfig.class);
 
     @Value("${app.ad-domain}")
     private String adDomain;
@@ -53,25 +53,39 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .authenticationEntryPoint(spnegoEntryPoint())
                     .and()
                 .authorizeRequests()
-                    .anyRequest().authenticated()
+                    .anyRequest().fullyAuthenticated()
                     .and()
-                /*.formLogin()
-                    .and()*/
-                .logout()
-                    .permitAll()
+                .formLogin()
                     .and()
                 .addFilterBefore(
                         spnegoAuthenticationProcessingFilter(),
                         BasicAuthenticationFilter.class
-                );
+                )
+                .csrf().disable();
     }
-
+// Рабочая версия.
+// По-экспериментировал? Не работает?
+// Удали свою хуиту и раскомментируй эту реализацию
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .authenticationProvider(kerberosServiceAuthenticationProvider())
                 .authenticationProvider(activeDirectoryLdapAuthenticationProvider());
     }
+
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth
+//                .ldapAuthentication()
+//                    .userDnPatterns("uid={0},ou=users") // ???
+//                    .groupSearchBase("ou=groups")
+//                .contextSource()
+//                    .url("ldap://WIN-HJLE4GOGD2D:389/dc=cml,dc=com")
+//                    .and()
+//                .passwordCompare()
+//                    .passwordEncoder(new BCryptPasswordEncoder())
+//                    .passwordAttribute("userPassword");
+//    }
 
     @Bean
     public ActiveDirectoryLdapAuthenticationProvider activeDirectoryLdapAuthenticationProvider() {
@@ -109,7 +123,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         SunJaasKerberosTicketValidator validator =
                 new SunJaasKerberosTicketValidator();
         validator.setServicePrincipal(servicePrincipal);
-        validator.setKeyTabLocation(new FileSystemResource(keytabLocation));
+        FileSystemResource resource = new FileSystemResource(keytabLocation);
+        validator.setKeyTabLocation(resource);
+        LOGGER.info(
+                "Initializing Kerberos KEYTAB file path:{} for principal:{}, file exists:{}",
+                resource.getFilename(), servicePrincipal, resource.exists()
+        );
         validator.setDebug(true);
         return validator;
     }
