@@ -18,17 +18,17 @@ public class ActiveDirectoryLdapAuthoritiesPopulator implements LdapAuthoritiesP
 
     @Override
     public Collection<? extends GrantedAuthority> getGrantedAuthorities(DirContextOperations userData, String username) {
-        LOGGER.info("getGrantedAuthorities() method");
+        LOGGER.info("\n\ngetGrantedAuthorities() method");
 
         String[] groups = userData.getStringAttributes("memberOf");
-        LOGGER.info("groups[]:{}", Arrays.toString(groups));
+        LOGGER.info("\n\ngroups[]:{}", Arrays.toString(groups));
 
         if (groups == null) {
             return AuthorityUtils.NO_AUTHORITIES;
         }
 
         ArrayList<GrantedAuthority> authorities = new ArrayList<>(groups.length);
-        LOGGER.info("authorities:{}", authorities);
+        LOGGER.info("\n\nauthorities:{}", authorities);
 
         for (String group : groups) {
             authorities.add(new SimpleGrantedAuthority(
@@ -37,7 +37,7 @@ public class ActiveDirectoryLdapAuthoritiesPopulator implements LdapAuthoritiesP
             );
         }
 
-        LOGGER.info("authorities now:{}", authorities);
+        LOGGER.info("\n\nauthorities now:{}", authorities);
 
         return authorities;
     }
