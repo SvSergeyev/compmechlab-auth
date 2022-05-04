@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -50,27 +51,28 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .exceptionHandling()
-                    .authenticationEntryPoint(spnegoEntryPoint())
-                    .and()
+                .authenticationEntryPoint(spnegoEntryPoint())
+                .and()
                 .authorizeRequests()
-                    .anyRequest().fullyAuthenticated()
-                    .and()
+                .antMatchers("/").permitAll()
+                .anyRequest().authenticated()
+                .and()
                 .formLogin()
-                    .and()
+                .loginPage("/login").permitAll()
+                .and()
+                .logout()
+                .permitAll()
+                .and()
                 .addFilterBefore(
-                        spnegoAuthenticationProcessingFilter(),
-                        BasicAuthenticationFilter.class
-                )
-                .csrf().disable();
+                        spnegoAuthenticationProcessingFilter(authenticationManagerBean()),
+                        BasicAuthenticationFilter.class);
     }
-// Рабочая версия.
-// По-экспериментировал? Не работает?
-// Удали всю написанную хуиту и раскомментируй эту реализацию
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .authenticationProvider(kerberosServiceAuthenticationProvider())
-                .authenticationProvider(activeDirectoryLdapAuthenticationProvider());
+                .authenticationProvider(activeDirectoryLdapAuthenticationProvider())
+                .authenticationProvider(kerberosServiceAuthenticationProvider());
     }
 
     @Bean
@@ -80,25 +82,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public SpnegoEntryPoint spnegoEntryPoint() {
-        return new SpnegoEntryPoint("/");
+        return new SpnegoEntryPoint("/login");
     }
 
     @Bean
-    public SpnegoAuthenticationProcessingFilter spnegoAuthenticationProcessingFilter() {
-        SpnegoAuthenticationProcessingFilter filter =
-                new SpnegoAuthenticationProcessingFilter();
-        try {
-            filter.setAuthenticationManager(authenticationManagerBean());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public SpnegoAuthenticationProcessingFilter spnegoAuthenticationProcessingFilter(
+            AuthenticationManager authenticationManager) {
+        SpnegoAuthenticationProcessingFilter filter = new SpnegoAuthenticationProcessingFilter();
+        filter.setAuthenticationManager(authenticationManager);
         return filter;
     }
 
     @Bean
     public KerberosServiceAuthenticationProvider kerberosServiceAuthenticationProvider() throws Exception {
-        KerberosServiceAuthenticationProvider provider =
-                new KerberosServiceAuthenticationProvider();
+        KerberosServiceAuthenticationProvider provider = new KerberosServiceAuthenticationProvider();
         provider.setTicketValidator(sunJaasKerberosTicketValidator());
         provider.setUserDetailsService(ldapUserDetailsService());
         return provider;
@@ -106,49 +103,43 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public SunJaasKerberosTicketValidator sunJaasKerberosTicketValidator() {
-        SunJaasKerberosTicketValidator validator =
-                new SunJaasKerberosTicketValidator();
-        validator.setServicePrincipal(servicePrincipal);
-        FileSystemResource resource = new FileSystemResource(keytabLocation);
-        validator.setKeyTabLocation(resource);
-        LOGGER.info(
-                "Initializing Kerberos KEYTAB file path:{} for principal:{}, file exists:{}",
-                resource.getFilename(), servicePrincipal, resource.exists()
-        );
-        validator.setDebug(true);
-        return validator;
+        SunJaasKerberosTicketValidator ticketValidator = new SunJaasKerberosTicketValidator();
+        ticketValidator.setServicePrincipal(servicePrincipal);
+        ticketValidator.setKeyTabLocation(new FileSystemResource(keytabLocation));
+        ticketValidator.setDebug(true);
+        return ticketValidator;
     }
 
     @Bean
     public KerberosLdapContextSource kerberosLdapContextSource() throws Exception {
-        KerberosLdapContextSource source = new KerberosLdapContextSource(adServer);
-        source.setLoginConfig(loginConfig());
-        return source;
+        KerberosLdapContextSource contextSource = new KerberosLdapContextSource(adServer);
+        contextSource.setLoginConfig(loginConfig());
+        return contextSource;
     }
 
     public SunJaasKrb5LoginConfig loginConfig() throws Exception {
-        SunJaasKrb5LoginConfig config = new SunJaasKrb5LoginConfig();
-        config.setKeyTabLocation(new FileSystemResource(keytabLocation));
-        config.setServicePrincipal(servicePrincipal);
-        config.setDebug(true);
-        config.setIsInitiator(true);
-        config.afterPropertiesSet();
-        return config;
+        SunJaasKrb5LoginConfig loginConfig = new SunJaasKrb5LoginConfig();
+        loginConfig.setKeyTabLocation(new FileSystemResource(keytabLocation));
+        loginConfig.setServicePrincipal(servicePrincipal);
+        loginConfig.setDebug(true);
+        loginConfig.setIsInitiator(true);
+        loginConfig.afterPropertiesSet();
+        return loginConfig;
     }
 
     @Bean
     public LdapUserDetailsService ldapUserDetailsService() throws Exception {
-        LOGGER.info("\n\nldapUserDetailsService() run");
-        FilterBasedLdapUserSearch search = new FilterBasedLdapUserSearch(
-                ldapSearchBase,
-                ldapSearchFilter,
-                kerberosLdapContextSource()
-        );
-        LdapUserDetailsService service = new LdapUserDetailsService(
-                search,
-                new ActiveDirectoryLdapAuthoritiesPopulator()
-        );
+        FilterBasedLdapUserSearch userSearch =
+                new FilterBasedLdapUserSearch(ldapSearchBase, ldapSearchFilter, kerberosLdapContextSource());
+        LdapUserDetailsService service =
+                new LdapUserDetailsService(userSearch, new ActiveDirectoryLdapAuthoritiesPopulator());
         service.setUserDetailsMapper(new LdapUserDetailsMapper());
         return service;
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 }
