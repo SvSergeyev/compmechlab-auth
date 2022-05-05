@@ -1,4 +1,4 @@
-package tech.sergeyev.compmechlabauth.config;
+package tech.sergeyev.ssoauthserver.config;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +22,7 @@ public class MvcConfig implements WebMvcConfigurer {
     public SpringResourceTemplateResolver templateResolver() {
         SpringResourceTemplateResolver resolver = new SpringResourceTemplateResolver();
         resolver.setApplicationContext(applicationContext);
-        resolver.setPrefix("/templates/");
+        resolver.setPrefix("classpath:/templates/");
         resolver.setSuffix(".html");
         return resolver;
     }
@@ -44,8 +44,7 @@ public class MvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("main");
+        registry.addViewController("/").setViewName("personal");
         registry.addViewController("/login").setViewName("login");
-        registry.addViewController("/hello").setViewName("hello");
     }
 }

@@ -1,4 +1,4 @@
-package tech.sergeyev.compmechlabauth.config;
+package tech.sergeyev.ssoauthserver.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import tech.sergeyev.compmechlabauth.ActiveDirectoryLdapAuthoritiesPopulator;
+import tech.sergeyev.ssoauthserver.ActiveDirectoryLdapAuthoritiesPopulator;
 
 @Configuration
 @EnableWebSecurity
@@ -54,7 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(spnegoEntryPoint())
                 .and()
                 .authorizeRequests()
-                .antMatchers("/").permitAll()
+                /*.antMatchers("/").permitAll()*/
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

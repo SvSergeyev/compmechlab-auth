@@ -1,4 +1,4 @@
-package tech.sergeyev.compmechlabauth;
+package tech.sergeyev.ssoauthserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +10,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 public class ActiveDirectoryLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {

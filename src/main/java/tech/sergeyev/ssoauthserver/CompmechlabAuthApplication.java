@@ -1,4 +1,4 @@
-package tech.sergeyev.compmechlabauth;
+package tech.sergeyev.ssoauthserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

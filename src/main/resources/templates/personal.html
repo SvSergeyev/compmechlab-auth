@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>SSO-Auth:Personal</title>
+</head>
+<body>
+<h3 th:inline="text">Remote user = '[[${#httpServletRequest.remoteUser}]]'</h3>
+<h3 th:inline="text">User principal name = '[[${#httpServletRequest.userPrincipal}]]'</h3>
+</body>
+</html>
